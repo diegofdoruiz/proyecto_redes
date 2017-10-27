@@ -1,0 +1,55 @@
+Definiendo el protocolo de comunicación:
+****Intranet - Psarela****
+	--Para enviar datos del estado de recusos desde la intranet a la pasarela se van a manjar las siguientes rutas y parámetros
+		method: PUT
+		ruta: set_state
+		parametro: state = {action:'ActualizarEstado', timestamp:'', ram:'', load:'', disk:''}
+
+	--Para solicitar las tareas asignadas desde internet que está registradas en la pasarela se van a manejar las siguientes   rutas sin parámetros
+		methods: GET
+		ruta: get_tasks
+
+	--Para verificar si han solicitado reportes de una o varias descargas asignada, no hay parametros
+		method: GET
+		ruta: get_tasks/request_progress
+
+	--Enviar periódicamente o como respuesta al pedido verificado anteriormente el estado de las descargas asumiendo que no hay imprevistos ni fallas, hay tres estados, sin iniciar, en progreso y finalizado. Las tareas finalizadas y que ya han sido reportadas no se incluyen más en los informes periódicos.
+	Se usa put porque solo se va a actualizar los campos de progreso y tiempo
+		method: PUT
+		ruta: tasks_progress
+		parametro = {task1: {name:'', timestamp:'', state:'', progress:''},
+					 taskn: {name:'', timestamp:'', state:'', progress:''}}
+
+****Internet - Pasarela****
+	--Para acceder a la información registrada en la pasarela del consumo de recursos del host que está en la intranet 
+	  desde internet se van a manejar los siguientes parametros y rutas.
+	  	method: GET
+		ruta: get_state
+		parametro: ram, load, disk
+
+		Cuando se accede con la ruta y además se entrega un parámetro, ej: http://dominio.com/get_state/ram, se retornará la
+		información correspondiente a ese recurso
+
+	--Para acceder a la información registrada en la pasarela del consumo de recursos del host que está en la intranet 
+	  desde internet se van a manejar las siguientes rutas sin parámetros.
+	  	method: GET
+		ruta: get_state
+
+		Cuando se accede solo con la ruta, ej: http://dominio.com/get_state, se retornará el valor correspondiente a los 
+		tres recursos.
+
+	--Para indicarle al host que está en la intranet que realice una descarga con el programa tansmission 
+		method: POST
+		ruta: set_task
+		parametro: task = {action:'download', name:'', link:'', torrent:'', timestamp:''}
+
+	--Para solicitar el progreso en una descarga especifica.
+		method: GET
+		ruta: task_progress
+		parametro: task_name
+
+
+
+
+
+
